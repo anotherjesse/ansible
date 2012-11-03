@@ -178,14 +178,15 @@ if len(sys.argv) == 2 and (sys.argv[1] == '--list'):
     # Cycle on servers
     for f in client.servers.list():
         # Define group (or set to empty string)
-        group = f.metadata['group'] if f.metadata.has_key('group') else 'undefined'
+        for group in f.metadata.get('groups', 'undefined').split(','):
+            group = group.strip()
+            # Create group if not exist
+            if group not in groups:
+                groups[group] = []
 
-        # Create group if not exist
-        if group not in groups:
-            groups[group] = []
-
-        # Append group to list
-        groups[group].append(f.accessIPv4)
+            # Append group to list
+            #groups[group].append(f.accessIPv4)
+            groups[group].append(f.networks.values()[0][0])
 
     # Return server list
     print json.dumps(groups)
